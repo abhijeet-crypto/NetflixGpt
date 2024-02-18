@@ -6,16 +6,16 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { USER_AVATAR } from "../utils/constant";
 
 const Login = () => {
   const dispatch = useDispatch();
   const [isSignIn, setIsSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
+
   const email = useRef(null);
   const password = useRef(null);
   const name = useRef(null);
@@ -35,31 +35,26 @@ const Login = () => {
       )
         .then((userCredential) => {
           // Signed up
-          const user = userCredential.user;
+          // const user = userCredential.user;
 
           updateProfile(auth.currentUser, {
             displayName: name.current.value,
-            photoURL: "https://example.com/jane-q-user/profile.jpg",
+            photoURL: USER_AVATAR,
           })
             .then(() => {
               const { uid, email, displayName } = auth.currentUser;
               dispatch(
                 addUser({ uid: uid, email: email, displayName: displayName })
               );
-              navigate("/browser");
             })
             .catch((error) => {
               setErrorMessage(error.message);
             });
-          console.log(user);
-          navigate("/browser");
-          // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + "-" + errorMessage);
-          // ..
         });
     } else {
       signInWithEmailAndPassword(
@@ -68,11 +63,7 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          console.log(user);
-          navigate("/browser");
-          // ...
+          // const user = userCredential.user;
         })
         .catch((error) => {
           const errorCode = error.code;
